@@ -104,18 +104,28 @@ export default function Pricing() {
           }),
       });
 
-      // ───── Счётчик цены в больших карточках ─────
+      // ───── Счётчик: цена «набегает» от 0 до значения при скролле ─────
       gsap.utils.toArray<HTMLElement>(".price-number").forEach((el) => {
         const target = Number(el.dataset.value);
-        const obj = { v: 0 };
+        const counter = { v: 0 };
         el.textContent = "0";
 
-        gsap.to(obj, {
+        gsap.to(counter, {
           v: target,
-          duration: 1.6,
+          duration: 2,
+          delay: 0.3, // даём карточке успеть появиться
           ease: "power2.out",
+          snap: { v: 1 }, // только целые числа
           onUpdate: () => {
-            el.textContent = String(Math.round(obj.v));
+            el.textContent = String(counter.v);
+          },
+          onComplete: () => {
+            // Небольшой «пульс» в конце счёта
+            gsap.fromTo(
+              el,
+              { scale: 1.08 },
+              { scale: 1, duration: 0.6, ease: "power2.out" }
+            );
           },
           scrollTrigger: { trigger: el, start: "top 90%", once: true },
         });
@@ -129,7 +139,7 @@ export default function Pricing() {
     <section
       ref={root}
       id="pricing"
-      className="relative overflow-hidden bg-[#0a0a0a] px-6 py-28 md:px-12 md:py-40"
+      className="relative overflow-hidden px-6 py-28 md:px-12 md:py-40"
     >
       <div
         className="pointer-events-none absolute -left-40 bottom-0 h-[36rem] w-[36rem] rounded-full"
@@ -173,8 +183,9 @@ export default function Pricing() {
               </p>
               <div className="mt-10 flex items-baseline gap-3">
                 <span
-                  className="price-number text-[clamp(4.5rem,10vw,8rem)] font-extralight leading-none"
+                  className="price-number inline-block origin-left text-[clamp(4.5rem,10vw,8rem)] font-extralight leading-none tabular-nums"
                   data-value={p.price}
+                  aria-label={`${p.price} рублей`}
                 >
                   {p.price}
                 </span>

@@ -1,26 +1,87 @@
+/* ФАЙЛ: src/app/globals.css */
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #0a0a0a;
+  --fg: #ffffff;
+  --accent: #2e4f3e;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-geist-sans, Arial), Helvetica, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ───────── Анимированный фон всего сайта ─────────
+   Слой 1: медленно переливающийся линейный градиент (чёрный → зелёный → синий).
+   Слой 2: мягкие цветные пятна, которые дрейфуют. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    #0a0a0a 0%,
+    #0c1f17 18%,
+    #0a0a0a 36%,
+    #0a1a2e 54%,
+    #0f2a20 72%,
+    #0a0a0a 100%
+  );
+  background-size: 300% 300%;
+  animation: bg-flow 28s ease-in-out infinite;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: -20%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 40% 35% at 20% 25%, rgba(46, 79, 62, 0.45), transparent 70%),
+    radial-gradient(ellipse 35% 40% at 80% 30%, rgba(24, 58, 110, 0.35), transparent 70%),
+    radial-gradient(ellipse 45% 35% at 55% 85%, rgba(46, 79, 62, 0.35), transparent 70%);
+  animation: bg-drift 36s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes bg-flow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes bg-drift {
+  0%   { transform: translate3d(-4%, -3%, 0) scale(1); }
+  50%  { transform: translate3d(3%, 4%, 0) scale(1.08); }
+  100% { transform: translate3d(5%, -4%, 0) scale(1.03); }
+}
+
+/* Секции прозрачные, чтобы сквозь них был виден анимированный фон */
+main > section,
+main > footer {
+  background-color: transparent !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  body::after {
+    animation: none;
+  }
 }
